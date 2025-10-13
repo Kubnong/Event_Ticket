@@ -79,7 +79,7 @@ router.post("/create_user", async (req, res) => {
 router.get("/event/:id", async (req, res) => {
   let user;
   const token = req.cookies.token;
-  
+
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -89,10 +89,18 @@ router.get("/event/:id", async (req, res) => {
     }
   }
 
-  const eventId = req.params._id;
-  const event = await Event.findById(eventId).populate("organizer_id");
+  try {
+    const eventId = req.params.id;
+    const event = await Event.findById(eventId).populate("organizer_id");
 
-  res.render("event_detail", { pageTitle: event.title, event, user });
+    if (!event) {
+      return res.status(404).render("404", { pageTitle: "ไม่พบกิจกรรม" });
+    }
+
+    res.render("event_detail", { pageTitle: event.title, event, user });
+  } catch (error) {
+    res.status(500).send("เกิดข้อผิดพลาดในเซิร์ฟเวอร์");
+  }
 });
 
 // Add to Cart
