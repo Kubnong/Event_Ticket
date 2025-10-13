@@ -119,4 +119,39 @@ router.delete("/event/:id", authMiddleware, async (req, res) => {
   }
 });
 
+router.get("/event/:id/dashboard", authMiddleware, async (req, res) => {
+  try {
+    const user = req.user;
+    const eventId = req.params.id;
+
+    if (user.role !== role) {
+      return res.redirect("/signin");
+    }
+
+    // 1. ค้นหาข้อมูลอีเวนต์
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).send("ไม่พบกิจกรรมนี้");
+    }
+
+    // 2. ตรวจสอบสิทธิ์ ว่าเป็นเจ้าของอีเวนต์จริง
+    if (event.organizer_id.toString() !== user._id.toString()) {
+      return res.status(403).send("คุณไม่มีสิทธิ์เข้าถึงหน้านี้");
+    }
+
+    // 3. ค้นหา Ticket ทั้งหมดของอีเวนต์นี้ และดึงข้อมูล user (เฉพาะ email) มาด้วย
+    const tickets = await Ticket.find({ event_id: eventId })
+                                .populate('user_id', 'email') // ใช้ .populate() เพื่อดึงข้อมูลจาก 'User' model
+                                .sort({ purchase_date: -1 });
+
+    res.render("event_dashboard", {
+      pageTitle: `Dashboard: ${event.title}`,
+      event: event,
+      tickets: tickets,
+    });
+  } catch (err) {
+    res.status(500).send("เกิดข้อผิดพลาด: " + err.message);
+  }
+});
+
 module.exports = router;
