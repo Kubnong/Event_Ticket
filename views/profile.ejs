@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="min-h-screen flex flex-col bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]">
+    <%- include('partials/navbar') %>
+
+    <main class="flex-1 mx-auto max-w-md px-6 py-14">
+      <div class="bg-neutral-900/80 border border-red-600/40 rounded-2xl shadow-[0_0_25px_rgba(229,9,20,0.3)] p-8 backdrop-blur-md">
+        <h1 class="font-bangers text-4xl text-red-500 drop-shadow-[0_0_12px_rgba(229,9,20,0.8)] mb-4">
+          โปรไฟล์ของฉัน
+        </h1>
+
+        <div class="space-y-1 mb-6">
+          <p><i class="fa-solid fa-envelope text-red-400 mr-2"></i> <%= user.email %></p>
+          <p><i class="fa-solid fa-user-gear text-red-400 mr-2"></i> <%= user.role === 'organizer' ? 'ผู้จัดงาน' : 'ผู้ซื้อบัตร' %></p>
+        </div>
+
+        <h2 class="text-lg font-semibold mb-2 text-red-400">เปลี่ยนรหัสผ่าน</h2>
+        <form id="pwForm" class="grid gap-3">
+          <input type="password" name="currentPassword" placeholder="รหัสผ่านเดิม" required
+                 class="rounded-lg bg-neutral-800 border border-red-500/40 px-3 py-2 text-white outline-none" />
+          <input type="password" name="newPassword" placeholder="รหัสผ่านใหม่ (อย่างน้อย 6 ตัว)" minlength="6" required
+                 class="rounded-lg bg-neutral-800 border border-red-500/40 px-3 py-2 text-white outline-none" />
+          <button class="w-full py-2 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition">
+            <i class="fa-solid fa-key mr-2"></i> บันทึกการเปลี่ยนแปลง
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+      document.getElementById('pwForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const body = Object.fromEntries(fd.entries());
+        try {
+          const r = await fetch('/profile/update-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const data = await r.json();
+          if (r.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'สำเร็จ!',
+              text: data.msg,
+              background: '#1a1a1a', color: '#fff', iconColor: '#e50914'
+            });
+            e.target.reset();
+          } else {
+            Swal.fire({
+              icon: 'warning',
+              title: 'ไม่สำเร็จ',
+              text: data.msg,
+              background: '#1a1a1a', color: '#fff', iconColor: '#e50914'
+            });
+          }
+        } catch {
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+            background: '#1a1a1a', color: '#fff', iconColor: '#e50914'
+          });
+        }
+      });
+    </script>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

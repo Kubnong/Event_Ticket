@@ -243,4 +243,54 @@ router.get("/my-tickets", authMiddleware, async (req, res) => {
   }
 });
 
+// View Profile
+router.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    res.render("profile", {
+      pageTitle: "โปรไฟล์ของฉัน",
+      user,
+    });
+  } catch (err) {
+    res.status(500).send("Server Error!");
+  }
+});
+
+// Update password
+router.post("/profile/update-password", authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "รหัสผ่านเดิมไม่ถูกต้อง" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    res.json({ msg: "เปลี่ยนรหัสผ่านสำเร็จ" });
+  } catch (err) {
+    res.status(500).json({ msg: "เกิดข้อผิดพลาดในการอัปเดต" });
+  }
+});
+
+// Ticket history
+router.get("/ticket-history", authMiddleware, async (req, res) => {
+  try {
+    const tickets = await Ticket.find({ user_id: req.user._id })
+      .populate("event_id")
+      .sort({ createdAt: -1 });
+
+    res.render("ticket_history", {
+      pageTitle: "ประวัติบัตรของฉัน",
+      tickets,
+    });
+  } catch (err) {
+    res.status(500).send("Server Error!");
+  }
+});
+
 module.exports = router;

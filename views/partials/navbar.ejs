@@ -1,8 +1,8 @@
-<!-- views/partials/navbar.ejs -->
 <nav class="backdrop-blur bg-black/60 border-b border-red-600/40 sticky top-0 z-50 shadow-[0_2px_15px_rgba(229,9,20,0.2)]">
-  <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-    <!-- LOGO -->
-    <a href="/" class="flex items-center gap-3 group">
+  <div class="mx-auto max-w-7xl px-5 py-3 flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
+
+    <!-- 🎟 LOGO -->
+    <a href="/" class="flex items-center gap-3 group shrink-0">
       <img
         src="/img/sticker-1.png"
         class="h-10 w-10 transition-transform group-hover:scale-110 drop-shadow-[0_0_10px_rgba(229,9,20,0.8)]"
@@ -13,13 +13,17 @@
       </span>
     </a>
 
-    <!-- SEARCH BAR -->
-    <form action="/" method="get" class="hidden md:flex items-center gap-2">
+    <!-- 🔍 SEARCH BAR (ซ่อนในจอเล็ก) -->
+    <form
+      action="/"
+      method="get"
+      class="hidden md:flex flex-1 items-center justify-center gap-2 max-w-md mx-auto"
+    >
       <input
         name="q"
         value="<%= (typeof q !== 'undefined' && q) ? q : '' %>"
         placeholder="ค้นหาอีเวนต์, สถานที่, หมวดหมู่…"
-        class="w-64 px-3 py-2 rounded-lg bg-neutral-800 border border-red-500/40 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
+        class="w-full px-3 py-2 rounded-lg bg-neutral-800 border border-red-500/40 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
       />
       <button
         class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-[0_0_10px_rgba(229,9,20,0.5)] hover:scale-[1.03] transition-all"
@@ -28,97 +32,127 @@
       </button>
     </form>
 
-    <!-- USER SECTION -->
-    <div class="flex items-center gap-3 text-sm">
+    <!-- 👤 USER SECTION -->
+    <div class="flex items-center gap-2 md:gap-3 text-sm shrink-0">
       <% if (typeof user !== 'undefined' && user) { %>
+
         <!-- Tickets -->
-        <a href="/my-tickets"
-          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/my-tickets') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+        <a
+          href="/my-tickets"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/my-tickets') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
           <i class="fa-solid fa-ticket mr-1"></i> ตั๋วของฉัน
         </a>
 
         <!-- Cart -->
-        <a href="/cart"
-          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/cart') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+        <a
+          href="/cart"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/cart') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
           <i class="fa-solid fa-cart-shopping mr-1"></i> ตะกร้า
+        </a>
+
+        <!-- Profile -->
+        <a
+          href="/profile"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/profile') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
+          <i class="fa-solid fa-user mr-1"></i> โปรไฟล์
+        </a>
+
+        <!-- Ticket History -->
+        <a
+          href="/ticket-history"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/ticket-history') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
+          <i class="fa-solid fa-clock-rotate-left mr-1"></i> ประวัติบัตร
         </a>
 
         <!-- Organizer dashboard -->
         <% if (user.role === 'organizer') { %>
-          <a href="/organizer/dashboard"
-            class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/organizer') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
-            <i class="fa-solid fa-gear mr-1"></i> แดชบอร์ดผู้จัด
-          </a>
+        <a
+          href="/organizer/dashboard"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/organizer') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
+          <i class="fa-solid fa-gear mr-1"></i> แดชบอร์ด
+        </a>
         <% } %>
 
-        <span class="text-gray-300">Hi, <%= user.email %></span>
+        <!-- Greeting + Logout -->
+        <span class="hidden md:inline text-gray-300">Hi, <%= user.email %></span>
 
-        <button id="logoutBtn" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition">
+        <button
+          id="logoutBtn"
+          class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold transition"
+        >
           <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
         </button>
 
-        <!-- ✅ ใช้ SweetAlert2 -->
+        <!-- ✅ SweetAlert2 Logout -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
           const logoutBtn = document.getElementById("logoutBtn");
           if (logoutBtn) {
             logoutBtn.addEventListener("click", async () => {
               const confirm = await Swal.fire({
-                title: 'ยืนยันการออกจากระบบ?',
-                text: 'คุณต้องการออกจากระบบตอนนี้หรือไม่',
-                icon: 'warning',
+                title: "ยืนยันการออกจากระบบ?",
+                text: "คุณต้องการออกจากระบบตอนนี้หรือไม่",
+                icon: "warning",
                 showCancelButton: true,
-                confirmButtonText: 'ออกจากระบบ',
-                cancelButtonText: 'ยกเลิก',
-                confirmButtonColor: '#e50914',
-                cancelButtonColor: '#444',
-                background: '#1a1a1a',
-                color: '#fff',
-                iconColor: '#e50914'
+                confirmButtonText: "ออกจากระบบ",
+                cancelButtonText: "ยกเลิก",
+                confirmButtonColor: "#e50914",
+                cancelButtonColor: "#444",
+                background: "#1a1a1a",
+                color: "#fff",
+                iconColor: "#e50914",
               });
 
               if (confirm.isConfirmed) {
                 try {
                   const r = await fetch("/logout");
                   const data = await r.json();
-
                   await Swal.fire({
-                    icon: 'success',
-                    title: 'ออกจากระบบสำเร็จ!',
-                    text: data.msg || 'กำลังพาคุณกลับสู่หน้าแรก...',
+                    icon: "success",
+                    title: "ออกจากระบบสำเร็จ!",
+                    text: data.msg || "กำลังพาคุณกลับหน้าแรก...",
                     timer: 1800,
                     showConfirmButton: false,
-                    background: '#1a1a1a',
-                    color: '#fff',
-                    iconColor: '#e50914'
+                    background: "#1a1a1a",
+                    color: "#fff",
+                    iconColor: "#e50914",
                   });
-
                   location.href = "/";
                 } catch (err) {
                   Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'ไม่สามารถออกจากระบบได้',
-                    confirmButtonColor: '#e50914',
-                    background: '#1a1a1a',
-                    color: '#fff',
-                    iconColor: '#e50914'
+                    icon: "error",
+                    title: "เกิดข้อผิดพลาด!",
+                    text: "ไม่สามารถออกจากระบบได้",
+                    confirmButtonColor: "#e50914",
+                    background: "#1a1a1a",
+                    color: "#fff",
+                    iconColor: "#e50914",
                   });
                 }
               }
             });
           }
         </script>
+
       <% } else { %>
         <!-- Sign in -->
-        <a href="/signin"
-          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/signin') ? 'bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white' %>">
+        <a
+          href="/signin"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/signin') ? 'bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white' %>"
+        >
           <i class="fa-solid fa-right-to-bracket mr-1"></i> เข้าสู่ระบบ
         </a>
 
         <!-- Sign up -->
-        <a href="/signup"
-          class="px-3 py-2 rounded-lg font-semibold border border-red-500/40 transition <%= currentPath.startsWith('/signup') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+        <a
+          href="/signup"
+          class="px-3 py-2 rounded-lg font-semibold border border-red-500/40 transition <%= currentPath.startsWith('/signup') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>"
+        >
           <i class="fa-solid fa-user-plus mr-1"></i> สมัครสมาชิก
         </a>
       <% } %>
