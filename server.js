@@ -1,0 +1,87 @@
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const connectDB = require("./config/db");
+const app = express();
+const port = process.env.PORT || 3000;
+const User = require("./model/user");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+
+connectDB();
+
+const organizerRoutes = require("./routes/organizer");
+const userRoutes = require("./routes/user");
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.use("/", userRoutes);
+app.use("/organizer", organizerRoutes);
+
+app.get("/signin", (req, res) => {
+  res.render("sign_in", { pageTitle: "เข้าสู่ระบบ" });
+});
+
+app.post("/login_user", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(400).json({ msg: "ไม่พบผู้ใช้" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "รหัสผ่านไม่ถูกต้อง" });
+    }
+
+    const payload = {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+
+    let redirectPath = "/";
+    if (user.role === "organizer") {
+      redirectPath = "/organizer/dashboard";
+    }
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 3600000,
+    });
+
+    res.status(200).json({
+      token,
+      msg: "เข้าสู่ระบบสำเร็จ",
+      redirectPath,
+    });
+  } catch (error) {
+    res.status(500).json({ msg: "เกิดข้อผิดพลาด", error: error.message });
+  }
+});
+
+app.get("/logout", async (req, res) => {
+  res.clearCookie("token", { httpOnly: true });
+  res.status(200).send({ msg: "ออกจากระบบสำเร็จ" });
+});
+
+app.use((req, res) => {
+  res.status(404).render("404", { pageTitle: "404" });
+});
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});

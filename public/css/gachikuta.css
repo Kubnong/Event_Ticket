@@ -1,0 +1,119 @@
+/* ฟอนต์หลัก */
+:root{
+  --gachi-accent: #b3ff00;
+  --gachi-accent-2: #7bffb2;
+  --gachi-dark: #0a0a0a;
+}
+body { font-family: 'Prompt', system-ui, -apple-system, Segoe UI, sans-serif; }
+.font-bangers { font-family: 'Bangers', cursive; }
+
+.gachi-bg{
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(179,255,0,.12), transparent 50%),
+              radial-gradient(1000px 500px at 110% 30%, rgba(123,255,178,.10), transparent 50%),
+              url('/img/bg-gachi.jpg') center/cover fixed,
+              linear-gradient(180deg, #080808, #060606);
+}
+
+.drop-shadow-neon{
+  filter: drop-shadow(0 0 10px rgba(179,255,0,.65));
+}
+
+/* Hero */
+.gachi-hero{
+  background: linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.4));
+  border-bottom: 1px solid rgba(179,255,0,.35);
+}
+
+/* Card/Panel */
+.gachi-card{
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(179,255,0,.35);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.35), 0 0 20px rgba(179,255,0,.06) inset;
+  overflow: hidden;
+}
+.gachi-panel{
+  background: rgba(0,0,0,.55);
+  border: 1px dashed rgba(179,255,0,.45);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35);
+}
+
+/* Tiny UI atoms */
+.badge{
+  display:inline-block;
+  padding: 6px 10px;
+  background: rgba(179,255,0,.15);
+  color: var(--gachi-accent);
+  border: 1px solid rgba(179,255,0,.35);
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.card-title{
+  font-weight: 800;
+  color: var(--gachi-accent);
+  text-shadow: 0 0 12px rgba(179,255,0,.35);
+}
+
+.nav-btn{
+  padding: 8px 12px;
+  border: 1px solid rgba(179,255,0,.35);
+  border-radius: 12px;
+  color: var(--gachi-accent);
+  background: rgba(0,0,0,.35);
+  transition: transform .15s;
+}
+.nav-btn:hover{ transform: translateY(-1px); }
+
+.btn-primary{
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: var(--gachi-accent);
+  color: #000;
+  font-weight: 800;
+  border: 1px solid #cfff61;
+  transition: transform .08s ease, box-shadow .2s;
+  box-shadow: 0 6px 20px rgba(179,255,0,.25);
+}
+.btn-primary:hover{ transform: translateY(-1px); }
+
+.btn-ghost{
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.35);
+  color: var(--gachi-accent-2);
+  border: 1px dashed rgba(123,255,178,.45);
+}
+
+.btn-danger{
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 70, 70, .12);
+  color: #ff8a8a;
+  border: 1px solid rgba(255, 70, 70, .45);
+}
+
+.input{
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(179,255,0,.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: #eaffcf;
+}
+.label{ color: #ddffc1; font-size: 14px; }
+
+/* QR mock */
+.qr-like{
+  width: 120px; height: 120px;
+  border: 4px solid var(--gachi-accent);
+  border-radius: 12px;
+  display: grid; place-items: center;
+  background: repeating-linear-gradient(45deg, rgba(179,255,0,.1), rgba(179,255,0,.1) 4px, transparent 4px, transparent 8px);
+}
+.qr-inner{
+  width: 70px; height: 70px; background:
+    conic-gradient(from 45deg, rgba(179,255,0,.4), transparent 25%, rgba(179,255,0,.4) 50%, transparent 75%);
+  border-radius: 6px;
+}

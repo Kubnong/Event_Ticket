@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="th">
+  <% include ./partials/head %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <% include ./partials/navbar %>
+
+    <main class="mx-auto max-w-6xl px-4 py-12">
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="font-bangers text-5xl text-lime-300 drop-shadow-neon">
+          Organizer Dashboard
+        </h1>
+        <a href="/organizer/create-event" class="btn-primary flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i> สร้างกิจกรรมใหม่
+        </a>
+      </div>
+
+      <% if (events && events.length > 0) { %>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% events.forEach(ev => { %>
+            <div class="gachi-card relative group">
+              <!-- <div class="h-40 bg-cover bg-center rounded-t-xl"
+                style="background-image: url('<%= ev.image_url || "/img/bg-gachi.jpg" %>')"></div> -->
+
+              <div class="p-4">
+                <h3 class="card-title text-xl"><%= ev.title %></h3>
+                <p class="mt-2 text-lime-100/80 line-clamp-2"><%= ev.description %></p>
+
+                <div class="mt-3 flex justify-between text-sm opacity-80">
+                  <span><i class="fa-solid fa-ticket"></i> <%= ev.available_tickets %> ใบ</span>
+                  <span><i class="fa-solid fa-coins"></i> ฿<%= ev.price %></span>
+                </div>
+
+                <div class="mt-5 flex items-center justify-between gap-2">
+                  <button class="btn-ghost edit-btn w-1/2" data-id="<%= ev._id %>">
+                    <i class="fa-solid fa-pen-to-square"></i> แก้ไข
+                  </button>
+                  <button class="btn-danger delete-btn w-1/2" data-id="<%= ev._id %>">
+                    <i class="fa-solid fa-trash"></i> ลบ
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p class="text-center opacity-80 mt-10">ยังไม่มีกิจกรรมที่สร้างไว้</p>
+      <% } %>
+    </main>
+
+    <script>
+      // แก้ไขกิจกรรม (redirect ไปหน้า /create-event?id=xxx)
+      document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-id');
+          window.location.href = `/organizer/create-event?edit=${id}`;
+        });
+      });
+
+      // ลบกิจกรรม
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('คุณแน่ใจหรือไม่ที่จะลบกิจกรรมนี้?')) return;
+          const id = btn.getAttribute('data-id');
+          try {
+            const res = await fetch(`/organizer/event/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            alert(data.msg);
+            if (res.ok) location.reload();
+          } catch (err) {
+            alert('เกิดข้อผิดพลาดในการลบกิจกรรม');
+          }
+        });
+      });
+    </script>
+
+    <% include ./partials/footer %>
+  </body>
+</html>

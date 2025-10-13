@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <%- include('partials/navbar') %>
+
+    <main class="mx-auto max-w-5xl px-4 py-10">
+      <h1 class="font-bangers text-5xl text-lime-300 drop-shadow-neon mb-6">ตะกร้าสินค้า</h1>
+
+      <% if (cartItems && cartItems.length) { %>
+        <div id="cartList" class="grid gap-4">
+          <% cartItems.forEach(item => { %>
+            <div class="gachi-card flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
+              <div class="flex items-center gap-4">
+                <!-- <img src="<%= (item.event_id && item.event_id.cover_image) || "/img/bg-gachi.jpg" %>"
+                     class="h-20 w-32 object-cover rounded-lg border border-lime-400/30" alt="cover"> -->
+                <div>
+                  <h3 class="card-title text-xl"><%= item.event_id ? item.event_id.title : "Event" %></h3>
+                  <div class="text-sm opacity-80">จำนวน: <%= item.quantity %></div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4">
+                <div class="text-lime-300 font-bold text-lg">฿<%= item.price %></div>
+                <button data-id="<%= item._id %>" class="btn-danger remove-btn">
+                  <i class="fa-solid fa-trash-can"></i> ลบ
+                </button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+
+        <div id="summary" class="gachi-panel mt-6">
+          <div class="flex items-center justify-between">
+            <span>จำนวนรายการทั้งหมด</span>
+            <span id="totalItems"><%= totalItems %></span>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <span>ราคารวม</span>
+            <span id="totalPrice" class="text-lime-300 font-bold">฿<%= totalPrice %></span>
+          </div>
+          <button id="checkoutBtn" class="btn-primary w-full mt-4"><i class="fa-solid fa-bolt"></i> ชำระเงิน</button>
+          <div id="cartMsg" class="mt-3 text-sm"></div>
+        </div>
+      <% } else { %>
+        <p class="opacity-80">ตะกร้าว่างเปล่า</p>
+      <% } %>
+    </main>
+
+    <script>
+      // ลบจากตะกร้า (DELETE /cart/remove/:id) + อัปเดต DOM
+      document.querySelectorAll('.remove-btn').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-id')
+          btn.disabled = true
+          try {
+            const r = await fetch('/cart/remove/'+id, { method:'DELETE' })
+            if(!r.ok) throw new Error('delete fail')
+            const data = await r.json()
+            // render ใหม่แบบง่าย ๆ
+            const list = document.getElementById('cartList')
+            list.innerHTML = data.cartItems.map(item=>`
+              <div class="gachi-card flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
+                <div class="flex items-center gap-4">
+                  <img src="${(item.event_id && item.event_id.cover_image) || "/img/bg-gachi.jpg"}"
+                       class="h-20 w-32 object-cover rounded-lg border border-lime-400/30" alt="cover">
+                  <div>
+                    <h3 class="card-title text-xl">${item.event_id ? item.event_id.title : "Event"}</h3>
+                    <div class="text-sm opacity-80">จำนวน: ${item.quantity}</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="text-lime-300 font-bold text-lg">฿${item.price}</div>
+                  <button data-id="${item._id}" class="btn-danger remove-btn">
+                    <i class="fa-solid fa-trash-can"></i> ลบ
+                  </button>
+                </div>
+              </div>
+            `).join('')
+
+            document.getElementById('totalItems').textContent = data.totalItems
+            document.getElementById('totalPrice').textContent = '฿'+data.totalPrice
+
+            // bind ใหม่ให้ปุ่มที่เพิ่ง render
+            document.querySelectorAll('.remove-btn').forEach(b=>{
+              b.addEventListener('click', async ()=> {
+                const id2 = b.getAttribute('data-id')
+                const rr = await fetch('/cart/remove/'+id2, { method:'DELETE' })
+                const dd = await rr.json()
+                // recursion re-render (ย่อ)
+                location.reload()
+              })
+            })
+          } catch (e) {
+            alert('ลบไม่สำเร็จ')
+          } finally {
+            btn.disabled = false
+          }
+        })
+      })
+
+      // Checkout
+      const checkoutBtn = document.getElementById('checkoutBtn')
+      if(checkoutBtn){
+        checkoutBtn.addEventListener('click', async ()=>{
+          checkoutBtn.disabled = true
+          const msg = document.getElementById('cartMsg')
+          msg.textContent = 'กำลังชำระเงิน...'
+          try{
+            const r = await fetch('/cart/checkout', { method:'POST' })
+            const data = await r.json()
+            if(r.ok){
+              msg.className = 'mt-3 text-sm text-lime-300'
+              msg.textContent = data.msg
+              setTimeout(()=>location.href='/my-tickets', 800)
+            }else{
+              msg.className = 'mt-3 text-sm text-rose-300'
+              msg.textContent = data.msg || 'ชำระเงินไม่สำเร็จ'
+            }
+          }catch(err){
+            msg.className = 'mt-3 text-sm text-rose-300'
+            msg.textContent = 'เกิดข้อผิดพลาด'
+          } finally {
+            checkoutBtn.disabled = false
+          }
+        })
+      }
+    </script>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

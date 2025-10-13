@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <%- include('partials/navbar') %>
+
+    <header class="gachi-hero">
+      <div class="mx-auto max-w-6xl px-4 py-16">
+        <h1 class="font-bangers text-6xl text-lime-300 drop-shadow-neon">Find Your Next Anime Event</h1>
+        <p class="mt-3 text-lime-100/80">ตะลุยโลกอีเวนต์สไตล์ Gachikuta — โทนจัดจ้าน ขอบนีออน!</p>
+
+        <form action="/" method="get" class="mt-6 flex gap-2 max-w-xl">
+          <input name="q" value="<%= (typeof q !== 'undefined' && q) ? q : '' %>"
+                 class="flex-1 px-4 py-3 rounded-xl bg-black/50 border border-lime-400/40"
+                 placeholder="เช่น cosplay, bangkok, music…">
+          <button class="px-5 py-3 rounded-xl bg-lime-400 text-black font-bold hover:scale-[1.02] transition">ค้นหา</button>
+        </form>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-6xl px-4 py-10">
+      <% if (events && events.length) { %>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <% events.forEach(ev => { %>
+            <div class="gachi-card">
+              <!-- <div class="h-40 w-full rounded-xl bg-cover bg-center"
+                   style="background-image:url('<%= ev.cover_image || "/img/bg-gachi.jpg" %>')"></div> -->
+
+              <div class="p-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="card-title"><%= ev.title %></h3>
+                  <span class="badge"><%= ev.category %></span>
+                </div>
+
+                <p class="mt-2 text-lime-100/80 line-clamp-2"><%= ev.description %></p>
+
+                <div class="mt-4 flex items-center justify-between text-sm">
+                  <span class="opacity-80"><i class="fa-solid fa-location-dot"></i> <%= ev.location %></span>
+                  <span class="font-semibold text-lime-300">
+                    ฿<%= ev.price %> | เหลือ <%= ev.available_tickets %>
+                  </span>
+                </div>
+
+                <div class="mt-5 flex items-center justify-between">
+                  <a href="/event/<%= ev._id %>" class="btn-ghost">รายละเอียด</a>
+
+                  <% if (user && ev.available_tickets > 0) { %>
+                    <form method="post" action="/add-to-cart/<%= ev._id %>">
+                      <input type="hidden" name="quantity" value="1"/>
+                      <button class="btn-primary"><i class="fa-solid fa-cart-plus"></i> ใส่ตะกร้า</button>
+                    </form>
+                  <% } else if (!user) { %>
+                    <a href="/signup" class="btn-primary">เข้าสู่ระบบเพื่อซื้อ</a>
+                  <% } else { %>
+                    <span class="text-rose-300">Sold out</span>
+                  <% } %>
+                </div>
+
+                <div class="mt-3 text-xs opacity-70">
+                  ผู้จัด: <%= ev.organizer_id ? ev.organizer_id.email : "-" %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p class="text-center opacity-80">ไม่พบกิจกรรมที่ค้นหา</p>
+      <% } %>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

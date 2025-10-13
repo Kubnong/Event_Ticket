@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <%- include('partials/navbar') %>
+
+    <main class="mx-auto max-w-md px-4 py-14">
+      <div class="gachi-panel">
+        <h1 class="font-bangers text-4xl text-lime-300 drop-shadow-neon">Sign Up</h1>
+        <p class="mt-1 opacity-80">สมัครสมาชิกเพื่อเริ่มซื้อตั๋วอีเวนต์สุดมันส์</p>
+
+        <form id="signupForm" method="post" action="/create_user" class="mt-6 grid gap-4">
+          <label class="grid gap-1">
+            <span class="label">อีเมล</span>
+            <input name="email" type="email" required class="input">
+          </label>
+
+          <label class="grid gap-1">
+            <span class="label">รหัสผ่าน</span>
+            <input name="password" type="password" required minlength="6" class="input">
+          </label>
+
+          <label class="grid gap-1">
+            <span class="label">บทบาท</span>
+            <select name="role" class="input">
+              <option value="attendee">Attendee</option>
+              <option value="organizer">Organizer</option>
+            </select>
+          </label>
+
+          <button class="btn-primary w-full mt-2">สร้างบัญชี</button>
+        </form>
+
+        <div id="signupMsg" class="mt-4 text-sm"></div>
+      </div>
+    </main>
+
+    <script>
+      // Submit via fetch -> แสดงข้อความสำเร็จ/ผิดพลาดแบบ AJAX
+      document.getElementById('signupForm').addEventListener('submit', async (e)=>{
+        e.preventDefault()
+        const form = e.target
+        const fd = new FormData(form)
+        const body = { email: fd.get('email'), password: fd.get('password'), role: fd.get('role') }
+        const msg = document.getElementById('signupMsg')
+        msg.textContent = 'กำลังสมัคร...'
+        try {
+          const r = await fetch('/create_user', {
+            method: 'POST',
+            headers: { 'Content-Type':'application/json' },
+            body: JSON.stringify(body)
+          })
+          const data = await r.json()
+          if(r.ok){
+            msg.className = 'mt-4 text-sm text-lime-300'
+            msg.textContent = data.msg + ' — ไปหน้าแรกเพื่อเริ่มต้นได้เลย'
+          } else {
+            msg.className = 'mt-4 text-sm text-rose-300'
+            msg.textContent = data.msg || 'สมัครไม่สำเร็จ'
+          }
+        } catch (err) {
+          msg.className = 'mt-4 text-sm text-rose-300'
+          msg.textContent = 'เกิดข้อผิดพลาด'
+        }
+      })
+    </script>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

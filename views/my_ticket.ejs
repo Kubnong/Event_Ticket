@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <%- include('partials/navbar') %>
+
+    <main class="mx-auto max-w-5xl px-4 py-10">
+      <h1 class="font-bangers text-5xl text-lime-300 drop-shadow-neon mb-6">ตั๋วของฉัน</h1>
+
+      <% if (myTickets && myTickets.length) { %>
+        <div class="grid gap-6 md:grid-cols-2">
+          <% myTickets.forEach(tk => { %>
+            <div class="gachi-card p-5">
+              <div class="flex items-center justify-between">
+                <h3 class="card-title text-2xl"><%= tk.event_id ? tk.event_id.title : "Event" %></h3>
+                <span class="badge">x<%= tk.quantity %></span>
+              </div>
+
+              <div class="mt-3 grid gap-1 text-sm opacity-85">
+                <div><i class="fa-solid fa-ticket"></i> โค้ดตั๋ว: <span class="font-mono text-lime-300"><%= tk.ticket_code %></span></div>
+                <% if (tk.event_id) { %>
+                  <div><i class="fa-solid fa-location-dot"></i> <%= tk.event_id.location %></div>
+                  <div><i class="fa-solid fa-coins"></i> ราคา ฿<%= tk.event_id.price %></div>
+                <% } %>
+              </div>
+
+              <div class="mt-4">
+                <div class="qr-like">
+                  <!-- สี่เหลี่ยมแทน QR (mock) -->
+                  <div class="qr-inner"></div>
+                </div>
+              </div>
+
+              <a href="/event/<%= tk.event_id ? tk.event_id._id : "#" %>" class="btn-ghost mt-4 inline-block">
+                รายละเอียดอีเวนต์
+              </a>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <p class="opacity-80">ยังไม่มีตั๋วที่ซื้อ</p>
+      <% } %>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

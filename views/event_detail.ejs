@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+  <%- include('partials/head') %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <%- include('partials/navbar') %>
+
+    <main class="mx-auto max-w-5xl px-4 py-10">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="gachi-card overflow-hidden">
+          <div class="p-5">
+            <span class="badge"><%= event.category %></span>
+            <h1 class="card-title mt-2"><%= event.title %></h1>
+            <p class="mt-3 text-lime-100/85 leading-relaxed"><%= event.description %></p>
+
+            <div class="mt-4 grid gap-1 text-sm opacity-80">
+              <div><i class="fa-solid fa-location-dot"></i> <%= event.location %></div>
+              <div><i class="fa-solid fa-coins"></i> ราคา ฿<%= event.price %></div>
+              <div><i class="fa-solid fa-ticket"></i> ตั๋วคงเหลือ <%= event.available_tickets %></div>
+              <div>ผู้จัด: <%= event.organizer_id ? event.organizer_id.email : "-" %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gachi-panel">
+          <h2 class="font-bangers text-3xl text-lime-300 drop-shadow-neon">ซื้อบัตร</h2>
+          <% if (user) { %>
+            <% if (event.available_tickets > 0) { %>
+              <form method="post" action="/add-to-cart/<%= event._id %>" class="mt-6 grid gap-4">
+                <label class="grid gap-1">
+                  <span class="label">จำนวน</span>
+                  <input type="number" name="quantity" value="1" min="1" max="<%= event.available_tickets %>" class="input">
+                </label>
+                <button class="btn-primary w-full"><i class="fa-solid fa-cart-plus"></i> เพิ่มเข้าตะกร้า</button>
+              </form>
+            <% } else { %>
+              <p class="mt-6 text-rose-300">Sold out</p>
+            <% } %>
+          <% } else { %>
+            <a href="/signup" class="btn-primary mt-6 inline-block">เข้าสู่ระบบ/สมัครสมาชิก</a>
+          <% } %>
+
+          <a href="/" class="btn-ghost mt-4 inline-block"><i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก</a>
+        </div>
+      </div>
+    </main>
+
+    <%- include('partials/footer') %>
+  </body>
+</html>

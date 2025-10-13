@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="th">
+  <% include ./partials/head %>
+  <body class="gachi-bg min-h-screen text-lime-50">
+    <% include ./partials/navbar %>
+
+    <main class="mx-auto max-w-3xl px-4 py-12">
+      <div class="gachi-panel">
+        <h1 class="font-bangers text-4xl text-lime-300 drop-shadow-neon">
+          <span id="formTitle">สร้างกิจกรรมใหม่</span>
+        </h1>
+        <p class="opacity-80">กรอกรายละเอียดกิจกรรมของคุณให้ครบถ้วน</p>
+
+        <form id="eventForm" class="mt-6 grid gap-4">
+          <label class="grid gap-1">
+            <span class="label">ชื่อกิจกรรม</span>
+            <input name="title" required class="input">
+          </label>
+
+          <label class="grid gap-1">
+            <span class="label">คำอธิบาย</span>
+            <textarea name="description" rows="3" required class="input"></textarea>
+          </label>
+
+          <label class="grid gap-1">
+            <span class="label">ลิงก์รูปภาพ (URL)</span>
+            <input name="image_url" placeholder="https://..." class="input">
+          </label>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="label">วันที่</span>
+              <input name="date" type="date" required class="input">
+            </label>
+
+            <label class="grid gap-1">
+              <span class="label">เวลา</span>
+              <input name="time" type="time" required class="input">
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="label">สถานที่</span>
+              <input name="location" required class="input">
+            </label>
+
+            <label class="grid gap-1">
+              <span class="label">หมวดหมู่</span>
+              <input name="category" placeholder="เช่น cosplay, concert" class="input">
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <label class="grid gap-1">
+              <span class="label">ราคา (บาท)</span>
+              <input name="price" type="number" step="0.01" required class="input">
+            </label>
+
+            <label class="grid gap-1">
+              <span class="label">จำนวนตั๋วทั้งหมด</span>
+              <input name="available_tickets" type="number" required class="input">
+            </label>
+          </div>
+
+          <button class="btn-primary w-full mt-4" type="submit">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกกิจกรรม
+          </button>
+        </form>
+
+        <div id="eventMsg" class="mt-4 text-sm"></div>
+      </div>
+    </main>
+
+    <script>
+      const form = document.getElementById('eventForm');
+      const msg = document.getElementById('eventMsg');
+      const params = new URLSearchParams(window.location.search);
+      const editId = params.get('edit');
+      const formTitle = document.getElementById('formTitle');
+
+      if (editId) {
+        formTitle.textContent = 'แก้ไขกิจกรรม';
+        fetch(`/organizer/event/${editId}`)
+          .then(res => res.json())
+          .then(data => {
+            Object.keys(data).forEach(k => {
+              if (form[k]) form[k].value = data[k];
+            });
+          });
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const body = Object.fromEntries(fd.entries());
+        msg.textContent = 'กำลังบันทึก...';
+        try {
+          const method = editId ? 'PUT' : 'POST';
+          const url = editId ? `/organizer/event/${editId}` : '/organizer/create-event';
+          const r = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await r.json();
+          if (r.ok) {
+            msg.className = 'mt-4 text-sm text-lime-300';
+            msg.textContent = data.msg;
+            setTimeout(() => window.location.href = '/organizer/dashboard', 1000);
+          } else {
+            msg.className = 'mt-4 text-sm text-rose-300';
+            msg.textContent = data.msg || 'บันทึกไม่สำเร็จ';
+          }
+        } catch (err) {
+          msg.className = 'mt-4 text-sm text-rose-300';
+          msg.textContent = 'เกิดข้อผิดพลาด';
+        }
+      });
+    </script>
+
+    <% include ./partials/footer %>
+  </body>
+</html>
