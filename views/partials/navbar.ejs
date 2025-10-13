@@ -1,62 +1,126 @@
 <!-- views/partials/navbar.ejs -->
-<nav
-  class="backdrop-blur bg-black/40 border-b border-lime-400/50 sticky top-0 z-50"
->
+<nav class="backdrop-blur bg-black/60 border-b border-red-600/40 sticky top-0 z-50 shadow-[0_2px_15px_rgba(229,9,20,0.2)]">
   <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-    <a href="/" class="flex items-center gap-3">
+    <!-- LOGO -->
+    <a href="/" class="flex items-center gap-3 group">
       <img
         src="/img/sticker-1.png"
-        class="h-10 w-10 drop-shadow-neon"
+        class="h-10 w-10 transition-transform group-hover:scale-110 drop-shadow-[0_0_10px_rgba(229,9,20,0.8)]"
         alt="logo"
       />
-      <span
-        class="font-bangers text-3xl tracking-wider text-lime-300 drop-shadow-neon"
-        >Gachikuta</span
-      >
+      <span class="font-bangers text-3xl tracking-wider text-red-500 drop-shadow-[0_0_10px_rgba(229,9,20,0.8)]">
+        TTM Ticket
+      </span>
     </a>
 
+    <!-- SEARCH BAR -->
     <form action="/" method="get" class="hidden md:flex items-center gap-2">
       <input
         name="q"
         value="<%= (typeof q !== 'undefined' && q) ? q : '' %>"
         placeholder="ค้นหาอีเวนต์, สถานที่, หมวดหมู่…"
-        class="w-64 px-3 py-2 rounded-lg bg-black/40 border border-lime-300/50 text-lime-100 focus:outline-none focus:ring-2 focus:ring-lime-400"
+        class="w-64 px-3 py-2 rounded-lg bg-neutral-800 border border-red-500/40 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-600"
       />
       <button
-        class="px-4 py-2 rounded-lg bg-lime-400 text-black font-semibold hover:translate-y-[-1px] transition"
+        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-[0_0_10px_rgba(229,9,20,0.5)] hover:scale-[1.03] transition-all"
       >
         ค้นหา
       </button>
     </form>
 
-    <div class="flex items-center gap-3">
+    <!-- USER SECTION -->
+    <div class="flex items-center gap-3 text-sm">
       <% if (typeof user !== 'undefined' && user) { %>
+        <!-- Tickets -->
+        <a href="/my-tickets"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/my-tickets') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+          <i class="fa-solid fa-ticket mr-1"></i> ตั๋วของฉัน
+        </a>
 
-      <a href="/my-tickets" class="nav-btn"
-        ><i class="fa-solid fa-ticket"></i> ตั๋วของฉัน</a
-      >
-      <a href="/cart" class="nav-btn"
-        ><i class="fa-solid fa-cart-shopping"></i> ตะกร้า</a
-      >
-      <span class="text-lime-200 text-sm">Hi, <%= user.email %></span>
-      <button id="logoutBtn" class="nav-btn">
-        <i class="fa-solid fa-right-from-bracket"></i> ออกจากระบบ
-      </button>
-      <script>
-        const logoutBtn = document.getElementById("logoutBtn");
-        if (logoutBtn) {
-          logoutBtn.addEventListener("click", async () => {
-            const r = await fetch("/logout");
-            const data = await r.json();
-            alert(data.msg);
-            location.href = "/";
-          });
-        }
-      </script>
+        <!-- Cart -->
+        <a href="/cart"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/cart') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+          <i class="fa-solid fa-cart-shopping mr-1"></i> ตะกร้า
+        </a>
+
+        <!-- Organizer dashboard -->
+        <% if (user.role === 'organizer') { %>
+          <a href="/organizer/dashboard"
+            class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/organizer') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+            <i class="fa-solid fa-gear mr-1"></i> แดชบอร์ดผู้จัด
+          </a>
+        <% } %>
+
+        <span class="text-gray-300">Hi, <%= user.email %></span>
+
+        <button id="logoutBtn" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> ออกจากระบบ
+        </button>
+
+        <!-- ✅ ใช้ SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+          const logoutBtn = document.getElementById("logoutBtn");
+          if (logoutBtn) {
+            logoutBtn.addEventListener("click", async () => {
+              const confirm = await Swal.fire({
+                title: 'ยืนยันการออกจากระบบ?',
+                text: 'คุณต้องการออกจากระบบตอนนี้หรือไม่',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'ออกจากระบบ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#e50914',
+                cancelButtonColor: '#444',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              });
+
+              if (confirm.isConfirmed) {
+                try {
+                  const r = await fetch("/logout");
+                  const data = await r.json();
+
+                  await Swal.fire({
+                    icon: 'success',
+                    title: 'ออกจากระบบสำเร็จ!',
+                    text: data.msg || 'กำลังพาคุณกลับสู่หน้าแรก...',
+                    timer: 1800,
+                    showConfirmButton: false,
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    iconColor: '#e50914'
+                  });
+
+                  location.href = "/";
+                } catch (err) {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด!',
+                    text: 'ไม่สามารถออกจากระบบได้',
+                    confirmButtonColor: '#e50914',
+                    background: '#1a1a1a',
+                    color: '#fff',
+                    iconColor: '#e50914'
+                  });
+                }
+              }
+            });
+          }
+        </script>
       <% } else { %>
-      <a href="/signup" class="nav-btn"
-        ><i class="fa-solid fa-user-plus"></i> สมัครสมาชิก</a
-      >
+        <!-- Sign in -->
+        <a href="/signin"
+          class="px-3 py-2 rounded-lg font-semibold transition <%= currentPath.startsWith('/signin') ? 'bg-red-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white' %>">
+          <i class="fa-solid fa-right-to-bracket mr-1"></i> เข้าสู่ระบบ
+        </a>
+
+        <!-- Sign up -->
+        <a href="/signup"
+          class="px-3 py-2 rounded-lg font-semibold border border-red-500/40 transition <%= currentPath.startsWith('/signup') ? 'bg-red-700 text-white' : 'bg-neutral-800 hover:bg-red-700 text-white' %>">
+          <i class="fa-solid fa-user-plus mr-1"></i> สมัครสมาชิก
+        </a>
       <% } %>
     </div>
   </div>

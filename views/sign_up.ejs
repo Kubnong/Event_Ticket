@@ -1,68 +1,118 @@
 <!DOCTYPE html>
 <html lang="th">
   <%- include('partials/head') %>
-  <body class="gachi-bg min-h-screen text-lime-50">
+  <body class="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]">
     <%- include('partials/navbar') %>
 
-    <main class="mx-auto max-w-md px-4 py-14">
-      <div class="gachi-panel">
-        <h1 class="font-bangers text-4xl text-lime-300 drop-shadow-neon">Sign Up</h1>
-        <p class="mt-1 opacity-80">สมัครสมาชิกเพื่อเริ่มซื้อตั๋วอีเวนต์สุดมันส์</p>
+    <main class="mx-auto max-w-md px-6 py-16">
+      <div class="bg-neutral-900/80 border border-red-600/40 shadow-[0_0_25px_rgba(229,9,20,0.2)] rounded-2xl p-8 backdrop-blur-md">
+        <h1 class="text-4xl font-bangers text-red-500 drop-shadow-[0_0_12px_rgba(229,9,20,0.8)]">Sign Up</h1>
+        <p class="mt-2 text-gray-300">สมัครสมาชิกเพื่อซื้อตั๋วคอนเสิร์ตหรืออีเวนต์สุดมันส์</p>
 
-        <form id="signupForm" method="post" action="/create_user" class="mt-6 grid gap-4">
-          <label class="grid gap-1">
-            <span class="label">อีเมล</span>
-            <input name="email" type="email" required class="input">
-          </label>
+        <form id="signupForm" class="mt-8 grid gap-5">
+          <div>
+            <label class="block text-sm mb-1 text-gray-300">อีเมล</label>
+            <input
+              name="email"
+              type="email"
+              required
+              class="w-full rounded-lg bg-neutral-800 border border-red-500/40 focus:border-red-500 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white placeholder-gray-400 transition"
+            />
+          </div>
 
-          <label class="grid gap-1">
-            <span class="label">รหัสผ่าน</span>
-            <input name="password" type="password" required minlength="6" class="input">
-          </label>
+          <div>
+            <label class="block text-sm mb-1 text-gray-300">รหัสผ่าน</label>
+            <input
+              name="password"
+              type="password"
+              minlength="6"
+              required
+              class="w-full rounded-lg bg-neutral-800 border border-red-500/40 focus:border-red-500 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white transition"
+            />
+          </div>
 
-          <label class="grid gap-1">
-            <span class="label">บทบาท</span>
-            <select name="role" class="input">
-              <option value="attendee">Attendee</option>
-              <option value="organizer">Organizer</option>
+          <div>
+            <label class="block text-sm mb-1 text-gray-300">บทบาท</label>
+            <select
+              name="role"
+              class="w-full rounded-lg bg-neutral-800 border border-red-500/40 focus:border-red-500 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+            >
+              <option value="attendee">ผู้ซื้อบัตร (Attendee)</option>
+              <option value="organizer">ผู้จัดงาน (Organizer)</option>
             </select>
-          </label>
+          </div>
 
-          <button class="btn-primary w-full mt-2">สร้างบัญชี</button>
+          <button
+            type="submit"
+            class="mt-4 w-full py-2.5 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white tracking-wide shadow-[0_0_15px_rgba(229,9,20,0.6)] transition-all duration-200 hover:scale-[1.02]"
+          >
+            สร้างบัญชี
+          </button>
         </form>
 
-        <div id="signupMsg" class="mt-4 text-sm"></div>
+        <p class="mt-6 text-gray-400 text-sm text-center">
+          มีบัญชีอยู่แล้ว?
+          <a href="/signin" class="text-red-500 hover:text-red-400 underline ml-1">เข้าสู่ระบบ</a>
+        </p>
       </div>
     </main>
 
+    <!-- ✅ SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-      // Submit via fetch -> แสดงข้อความสำเร็จ/ผิดพลาดแบบ AJAX
-      document.getElementById('signupForm').addEventListener('submit', async (e)=>{
-        e.preventDefault()
-        const form = e.target
-        const fd = new FormData(form)
-        const body = { email: fd.get('email'), password: fd.get('password'), role: fd.get('role') }
-        const msg = document.getElementById('signupMsg')
-        msg.textContent = 'กำลังสมัคร...'
+      document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const fd = new FormData(form);
+        const body = {
+          email: fd.get('email'),
+          password: fd.get('password'),
+          role: fd.get('role')
+        };
+
         try {
           const r = await fetch('/create_user', {
             method: 'POST',
-            headers: { 'Content-Type':'application/json' },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
-          })
-          const data = await r.json()
-          if(r.ok){
-            msg.className = 'mt-4 text-sm text-lime-300'
-            msg.textContent = data.msg + ' — ไปหน้าแรกเพื่อเริ่มต้นได้เลย'
+          });
+          const data = await r.json();
+
+          if (r.ok) {
+            Swal.fire({
+              icon: 'success',
+              title: 'สมัครสมาชิกสำเร็จ!',
+              text: data.msg || 'สามารถเข้าสู่ระบบได้เลย',
+              confirmButtonText: 'เข้าสู่ระบบ',
+              confirmButtonColor: '#e50914',
+              background: '#1a1a1a',
+              color: '#fff',
+              iconColor: '#e50914'
+            }).then(() => window.location.href = '/signin');
           } else {
-            msg.className = 'mt-4 text-sm text-rose-300'
-            msg.textContent = data.msg || 'สมัครไม่สำเร็จ'
+            Swal.fire({
+              icon: 'warning',
+              title: 'สมัครไม่สำเร็จ',
+              text: data.msg || 'กรุณาลองใหม่อีกครั้ง',
+              confirmButtonColor: '#e50914',
+              background: '#1a1a1a',
+              color: '#fff',
+              iconColor: '#e50914'
+            });
           }
         } catch (err) {
-          msg.className = 'mt-4 text-sm text-rose-300'
-          msg.textContent = 'เกิดข้อผิดพลาด'
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+            confirmButtonColor: '#e50914',
+            background: '#1a1a1a',
+            color: '#fff',
+            iconColor: '#e50914'
+          });
         }
-      })
+      });
     </script>
 
     <%- include('partials/footer') %>

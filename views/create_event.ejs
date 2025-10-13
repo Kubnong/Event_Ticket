@@ -1,120 +1,199 @@
 <!DOCTYPE html>
 <html lang="th">
   <%- include('partials/head') %>
-  <body class="gachi-bg min-h-screen text-lime-50">
+  <body
+    class="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]"
+  >
     <%- include('partials/navbar') %>
 
-    <main class="mx-auto max-w-3xl px-4 py-12">
-      <div class="gachi-panel">
-        <h1 class="font-bangers text-4xl text-lime-300 drop-shadow-neon">
+    <main class="mx-auto max-w-3xl px-4 py-14">
+      <div
+        class="bg-neutral-900/80 border border-red-600/40 rounded-2xl shadow-[0_0_25px_rgba(229,9,20,0.25)] p-8 backdrop-blur-md"
+      >
+        <h1
+          class="font-bangers text-4xl text-red-500 drop-shadow-[0_0_12px_rgba(229,9,20,0.8)] mb-2"
+        >
           <span id="formTitle">สร้างกิจกรรมใหม่</span>
         </h1>
-        <p class="opacity-80">กรอกรายละเอียดกิจกรรมของคุณให้ครบถ้วน</p>
+        <p class="text-gray-300 text-sm mb-6">
+          กรอกรายละเอียดกิจกรรมของคุณให้ครบถ้วน
+        </p>
 
-        <form id="eventForm" class="mt-6 grid gap-4">
+        <form id="eventForm" class="grid gap-5">
           <label class="grid gap-1">
-            <span class="label">ชื่อกิจกรรม</span>
-            <input name="title" required class="input">
+            <span class="text-sm text-gray-300">ชื่อกิจกรรม</span>
+            <input
+              name="title"
+              required
+              class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+            />
           </label>
 
           <label class="grid gap-1">
-            <span class="label">คำอธิบาย</span>
-            <textarea name="description" rows="3" required class="input"></textarea>
+            <span class="text-sm text-gray-300">คำอธิบาย</span>
+            <textarea
+              name="description"
+              rows="3"
+              required
+              class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+            ></textarea>
           </label>
 
           <label class="grid gap-1">
-            <span class="label">ลิงก์รูปภาพ (URL)</span>
-            <input name="image_url" placeholder="https://..." class="input">
+            <span class="text-sm text-gray-300">ลิงก์รูปภาพ (URL)</span>
+            <input
+              name="image_url"
+              placeholder="https://..."
+              class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+            />
           </label>
 
           <div class="grid md:grid-cols-2 gap-4">
             <label class="grid gap-1">
-              <span class="label">วันที่</span>
-              <input name="date" type="date" required class="input">
+              <span class="text-sm text-gray-300">วันที่</span>
+              <input
+                name="date"
+                type="date"
+                required
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              />
             </label>
 
             <label class="grid gap-1">
-              <span class="label">เวลา</span>
-              <input name="time" type="time" required class="input">
+              <span class="text-sm text-gray-300">เวลา</span>
+              <input
+                name="time"
+                type="time"
+                required
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              />
             </label>
           </div>
 
           <div class="grid md:grid-cols-2 gap-4">
             <label class="grid gap-1">
-              <span class="label">สถานที่</span>
-              <input name="location" required class="input">
+              <span class="text-sm text-gray-300">สถานที่</span>
+              <input
+                name="location"
+                required
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              />
             </label>
 
             <label class="grid gap-1">
-              <span class="label">หมวดหมู่</span>
-              <input name="category" placeholder="เช่น cosplay, concert" class="input">
+              <span class="text-sm text-gray-300">หมวดหมู่</span>
+              <select
+                name="category"
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              >
+                <option value="Concert">🎤 Concert</option>
+                <option value="Conference" selected>💼 Conference</option>
+                <option value="Sports">🏆 Sports</option>
+                <option value="Festival">🎪 Festival</option>
+                <option value="Workshop">🧠 Workshop</option>
+              </select>
             </label>
           </div>
 
           <div class="grid md:grid-cols-2 gap-4">
             <label class="grid gap-1">
-              <span class="label">ราคา (บาท)</span>
-              <input name="price" type="number" step="0.01" required class="input">
+              <span class="text-sm text-gray-300">ราคา (บาท)</span>
+              <input
+                name="price"
+                type="number"
+                step="0.01"
+                required
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              />
             </label>
 
             <label class="grid gap-1">
-              <span class="label">จำนวนตั๋วทั้งหมด</span>
-              <input name="available_tickets" type="number" required class="input">
+              <span class="text-sm text-gray-300">จำนวนตั๋วทั้งหมด</span>
+              <input
+                name="available_tickets"
+                type="number"
+                required
+                class="rounded-lg bg-neutral-800 border border-red-500/40 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white"
+              />
             </label>
           </div>
 
-          <button class="btn-primary w-full mt-4" type="submit">
-            <i class="fa-solid fa-floppy-disk"></i> บันทึกกิจกรรม
+          <button
+            class="w-full py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-[0_0_15px_rgba(229,9,20,0.6)] transition hover:scale-[1.02]"
+            type="submit"
+          >
+            <i class="fa-solid fa-floppy-disk mr-2"></i> บันทึกกิจกรรม
           </button>
         </form>
-
-        <div id="eventMsg" class="mt-4 text-sm"></div>
       </div>
     </main>
 
     <script>
-      const form = document.getElementById('eventForm');
-      const msg = document.getElementById('eventMsg');
+      const form = document.getElementById("eventForm");
       const params = new URLSearchParams(window.location.search);
-      const editId = params.get('edit');
-      const formTitle = document.getElementById('formTitle');
+      const editId = params.get("edit");
+      const formTitle = document.getElementById("formTitle");
 
       if (editId) {
-        formTitle.textContent = 'แก้ไขกิจกรรม';
+        formTitle.textContent = "แก้ไขกิจกรรม";
         fetch(`/organizer/event/${editId}`)
-          .then(res => res.json())
-          .then(data => {
-            Object.keys(data).forEach(k => {
+          .then((res) => res.json())
+          .then((data) => {
+            Object.keys(data).forEach((k) => {
               if (form[k]) form[k].value = data[k];
             });
           });
       }
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
         const fd = new FormData(form);
         const body = Object.fromEntries(fd.entries());
-        msg.textContent = 'กำลังบันทึก...';
+
         try {
-          const method = editId ? 'PUT' : 'POST';
-          const url = editId ? `/organizer/event/${editId}` : '/organizer/create-event';
+          const method = editId ? "PUT" : "POST";
+          const url = editId
+            ? `/organizer/event/${editId}`
+            : "/organizer/create-event";
           const r = await fetch(url, {
             method,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
           });
           const data = await r.json();
+
           if (r.ok) {
-            msg.className = 'mt-4 text-sm text-lime-300';
-            msg.textContent = data.msg;
-            setTimeout(() => window.location.href = '/organizer/dashboard', 1000);
+            Swal.fire({
+              icon: "success",
+              title: "บันทึกสำเร็จ!",
+              text: data.msg || "ข้อมูลกิจกรรมถูกบันทึกเรียบร้อย",
+              confirmButtonText: "กลับสู่แดชบอร์ด",
+              confirmButtonColor: "#e50914",
+              background: "#1a1a1a",
+              color: "#fff",
+              iconColor: "#e50914",
+            }).then(() => (window.location.href = "/organizer/dashboard"));
           } else {
-            msg.className = 'mt-4 text-sm text-rose-300';
-            msg.textContent = data.msg || 'บันทึกไม่สำเร็จ';
+            Swal.fire({
+              icon: "warning",
+              title: "บันทึกไม่สำเร็จ",
+              text: data.msg || "กรุณาตรวจสอบข้อมูลอีกครั้ง",
+              confirmButtonColor: "#e50914",
+              background: "#1a1a1a",
+              color: "#fff",
+              iconColor: "#e50914",
+            });
           }
         } catch (err) {
-          msg.className = 'mt-4 text-sm text-rose-300';
-          msg.textContent = 'เกิดข้อผิดพลาด';
+          Swal.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+            confirmButtonColor: "#e50914",
+            background: "#1a1a1a",
+            color: "#fff",
+            iconColor: "#e50914",
+          });
         }
       });
     </script>
