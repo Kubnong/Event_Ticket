@@ -1,7 +1,35 @@
 <!-- views/partials/footer.ejs -->
-<footer class="mt-16 border-t border-lime-400/40 bg-black/40">
-  <div class="mx-auto max-w-6xl px-4 py-10 text-center">
-    <p class="text-lime-200/80">© <span id="y"></span> Gachikuta Events — Built for anime lovers</p>
+<footer class="mt-20 border-t border-red-600/40 bg-black/60 backdrop-blur-md shadow-[0_-2px_15px_rgba(229,9,20,0.15)]">
+  <div class="mx-auto max-w-6xl px-4 py-10 text-center text-gray-300">
+    <p class="text-sm tracking-wide">
+      © <span id="y"></span> 
+      <span class="text-red-500 font-semibold">TTM Ticket</span> — 
+      Your gateway to concerts, shows & live events in Thailand 🎫
+    </p>
+
+    <div class="mt-4 flex justify-center gap-6 text-red-400">
+      <a href="#" class="hover:text-red-300 transition">
+        <i class="fa-brands fa-facebook text-xl"></i>
+      </a>
+      <a href="#" class="hover:text-red-300 transition">
+        <i class="fa-brands fa-twitter text-xl"></i>
+      </a>
+      <a href="#" class="hover:text-red-300 transition">
+        <i class="fa-brands fa-instagram text-xl"></i>
+      </a>
+      <a href="#" class="hover:text-red-300 transition">
+        <i class="fa-brands fa-line text-xl"></i>
+      </a>
+    </div>
+
+    <div class="mt-6 text-xs text-gray-400 space-x-4">
+      <a href="#" class="hover:text-red-400">เกี่ยวกับเรา</a>
+      <a href="#" class="hover:text-red-400">ติดต่อเรา</a>
+      <a href="#" class="hover:text-red-400">นโยบายความเป็นส่วนตัว</a>
+    </div>
   </div>
-  <script>document.getElementById('y').textContent = new Date().getFullYear()</script>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear()
+  </script>
 </footer>

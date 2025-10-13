@@ -11,6 +11,7 @@ const cookieParser = require("cookie-parser");
 
 connectDB();
 
+
 const organizerRoutes = require("./routes/organizer");
 const userRoutes = require("./routes/user");
 
@@ -21,6 +22,28 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+app.use(async (req, res, next) => {
+  const token = req.cookies.token;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.id);
+      res.locals.user = user;
+    } catch (err) {
+      res.locals.user = null;
+    }
+  } else {
+    res.locals.user = null;
+  }
+  next();
+});
+
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
+
 
 app.use("/", userRoutes);
 app.use("/organizer", organizerRoutes);
@@ -81,6 +104,7 @@ app.get("/logout", async (req, res) => {
 app.use((req, res) => {
   res.status(404).render("404", { pageTitle: "404" });
 });
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

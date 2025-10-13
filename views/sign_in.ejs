@@ -1,64 +1,122 @@
 <!DOCTYPE html>
 <html lang="th">
   <%- include('partials/head') %>
-  <body class="gachi-bg min-h-screen text-lime-50">
+  <body
+    class="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]"
+  >
     <%- include('partials/navbar') %>
 
-    <main class="mx-auto max-w-md px-4 py-14">
-      <div class="gachi-panel">
-        <h1 class="font-bangers text-4xl text-lime-300 drop-shadow-neon">Sign In</h1>
-        <p class="mt-1 opacity-80">เข้าสู่ระบบเพื่อจัดการหรือซื้อตั๋วอีเวนต์สุดมันส์</p>
+    <main class="mx-auto max-w-md px-6 py-16">
+      <div
+        class="bg-neutral-900/80 border border-red-600/40 shadow-[0_0_25px_rgba(229,9,20,0.2)] rounded-2xl p-8 backdrop-blur-md"
+      >
+        <h1
+          class="text-4xl font-bangers text-red-500 drop-shadow-[0_0_12px_rgba(229,9,20,0.8)]"
+        >
+          Sign In
+        </h1>
+        <p class="mt-2 text-gray-300">
+          เข้าสู่ระบบเพื่อจัดการอีเวนต์หรือซื้อตั๋วสุดมันส์
+        </p>
 
-        <form id="signinForm" method="post" action="/login_user" class="mt-6 grid gap-4">
-          <label class="grid gap-1">
-            <span class="label">อีเมล</span>
-            <input name="email" type="email" required class="input">
-          </label>
+        <form id="signinForm" class="mt-8 grid gap-5">
+          <div>
+            <label class="block text-sm mb-1 text-gray-300">อีเมล</label>
+            <input
+              name="email"
+              type="email"
+              required
+              class="w-full rounded-lg bg-neutral-800 border border-red-500/40 focus:border-red-500 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white placeholder-gray-400 transition"
+            />
+          </div>
 
-          <label class="grid gap-1">
-            <span class="label">รหัสผ่าน</span>
-            <input name="password" type="password" required minlength="6" class="input">
-          </label>
+          <div>
+            <label class="block text-sm mb-1 text-gray-300">รหัสผ่าน</label>
+            <input
+              name="password"
+              type="password"
+              minlength="6"
+              required
+              class="w-full rounded-lg bg-neutral-800 border border-red-500/40 focus:border-red-500 focus:ring-2 focus:ring-red-600 outline-none px-3 py-2 text-white transition"
+            />
+          </div>
 
-          <button class="btn-primary w-full mt-2">เข้าสู่ระบบ</button>
+          <button
+            type="submit"
+            class="mt-4 w-full py-2.5 bg-red-600 hover:bg-red-700 rounded-lg font-bold text-white tracking-wide shadow-[0_0_15px_rgba(229,9,20,0.6)] transition-all duration-200 hover:scale-[1.02]"
+          >
+            เข้าสู่ระบบ
+          </button>
         </form>
 
-        <div id="signinMsg" class="mt-4 text-sm"></div>
-
-        <p class="mt-6 text-lime-200/80 text-sm">
-          ยังไม่มีบัญชี? <a href="/signup" class="underline text-lime-300">สมัครสมาชิก</a>
+        <p class="mt-6 text-gray-400 text-sm text-center">
+          ยังไม่มีบัญชี?
+          <a
+            href="/signup"
+            class="text-red-500 hover:text-red-400 underline ml-1"
+            >สมัครสมาชิก</a
+          >
         </p>
       </div>
     </main>
 
+    <!-- ✅ SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-      document.getElementById('signinForm').addEventListener('submit', async (e)=>{
-        e.preventDefault()
-        const form = e.target
-        const fd = new FormData(form)
-        const body = { email: fd.get('email'), password: fd.get('password') }
-        const msg = document.getElementById('signinMsg')
-        msg.textContent = 'กำลังตรวจสอบ...'
-        try {
-          const r = await fetch('/login_user', {
-            method: 'POST',
-            headers: { 'Content-Type':'application/json' },
-            body: JSON.stringify(body)
-          })
-          const data = await r.json()
-          if (r.ok){
-            msg.className = 'mt-4 text-sm text-lime-300'
-            msg.textContent = data.msg + ' กำลังพาไปหน้าแรก...'
-            setTimeout(()=>window.location.href=data.redirectPath, 1000)
-          } else {
-            msg.className = 'mt-4 text-sm text-rose-300'
-            msg.textContent = data.msg || 'เข้าสู่ระบบไม่สำเร็จ'
+      document
+        .getElementById("signinForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const fd = new FormData(form);
+          const body = { email: fd.get("email"), password: fd.get("password") };
+
+          try {
+            const r = await fetch("/login_user", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await r.json();
+
+            if (r.ok) {
+              Swal.fire({
+                icon: "success",
+                title: "เข้าสู่ระบบสำเร็จ!",
+                text: data.msg || "กำลังพาคุณไปยังหน้าแรก...",
+                timer: 2000, // 
+                showConfirmButton: false,
+                timerProgressBar: true,
+                background: "#1a1a1a",
+                color: "#fff",
+                iconColor: "#e50914",
+              }).then(() => {
+                window.location.href = data.redirectPath;
+              });
+            } else {
+              Swal.fire({
+                icon: "warning",
+                title: "เข้าสู่ระบบไม่สำเร็จ",
+                text: data.msg || "กรุณาตรวจสอบอีเมลหรือรหัสผ่านอีกครั้ง",
+                confirmButtonColor: "#e50914",
+                background: "#1a1a1a",
+                color: "#fff",
+                iconColor: "#e50914",
+              });
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: "error",
+              title: "เกิดข้อผิดพลาด",
+              text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+              confirmButtonColor: "#e50914",
+              background: "#1a1a1a",
+              color: "#fff",
+              iconColor: "#e50914",
+            });
           }
-        } catch (err) {
-          msg.className = 'mt-4 text-sm text-rose-300'
-          msg.textContent = 'เกิดข้อผิดพลาด'
-        }
-      })
+        });
     </script>
 
     <%- include('partials/footer') %>

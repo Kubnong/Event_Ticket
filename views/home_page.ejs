@@ -1,73 +1,142 @@
 <!DOCTYPE html>
 <html lang="th">
   <%- include('partials/head') %>
-  <body class="gachi-bg min-h-screen text-lime-50">
+  <body class="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]">
     <%- include('partials/navbar') %>
 
-    <header class="gachi-hero">
-      <div class="mx-auto max-w-6xl px-4 py-16">
-        <h1 class="font-bangers text-6xl text-lime-300 drop-shadow-neon">Find Your Next Anime Event</h1>
-        <p class="mt-3 text-lime-100/80">ตะลุยโลกอีเวนต์สไตล์ Gachikuta — โทนจัดจ้าน ขอบนีออน!</p>
-
-        <form action="/" method="get" class="mt-6 flex gap-2 max-w-xl">
-          <input name="q" value="<%= (typeof q !== 'undefined' && q) ? q : '' %>"
-                 class="flex-1 px-4 py-3 rounded-xl bg-black/50 border border-lime-400/40"
-                 placeholder="เช่น cosplay, bangkok, music…">
-          <button class="px-5 py-3 rounded-xl bg-lime-400 text-black font-bold hover:scale-[1.02] transition">ค้นหา</button>
-        </form>
-      </div>
-    </header>
-
-    <main class="mx-auto max-w-6xl px-4 py-10">
+    <!-- EVENT CARDS -->
+    <main class="mx-auto max-w-6xl px-4 py-14">
       <% if (events && events.length) { %>
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           <% events.forEach(ev => { %>
-            <div class="gachi-card">
-              <!-- <div class="h-40 w-full rounded-xl bg-cover bg-center"
-                   style="background-image:url('<%= ev.cover_image || "/img/bg-gachi.jpg" %>')"></div> -->
+            <div
+              class="bg-neutral-900/80 border border-red-600/40 shadow-[0_0_25px_rgba(229,9,20,0.2)] rounded-2xl overflow-hidden transition-transform hover:scale-[1.02]"
+            >
+              <% if (ev.image_url) { %>
+                <div
+                  class="h-44 w-full bg-cover bg-center"
+                  style="background-image:url('<%= ev.image_url %>')"
+                ></div>
+              <% } else { %>
+                <div
+                  class="h-44 w-full bg-cover bg-center bg-[url('/img/concert-bg.jpg')] opacity-60"
+                ></div>
+              <% } %>
 
-              <div class="p-4">
+              <div class="p-5">
                 <div class="flex items-center justify-between">
-                  <h3 class="card-title"><%= ev.title %></h3>
-                  <span class="badge"><%= ev.category %></span>
+                  <h3 class="text-xl font-semibold text-white">
+                    <%= ev.title %>
+                  </h3>
+                  <span
+                    class="bg-red-600/80 text-white text-xs px-3 py-1 rounded-full"
+                    ><%= ev.category %></span
+                  >
                 </div>
 
-                <p class="mt-2 text-lime-100/80 line-clamp-2"><%= ev.description %></p>
+                <p class="mt-2 text-gray-300 line-clamp-2">
+                  <%= ev.description %>
+                </p>
 
-                <div class="mt-4 flex items-center justify-between text-sm">
-                  <span class="opacity-80"><i class="fa-solid fa-location-dot"></i> <%= ev.location %></span>
-                  <span class="font-semibold text-lime-300">
+                <div class="mt-4 flex items-center justify-between text-sm text-gray-400">
+                  <span><i class="fa-solid fa-location-dot text-red-500"></i> <%= ev.location %></span>
+                  <span class="font-semibold text-red-400">
                     ฿<%= ev.price %> | เหลือ <%= ev.available_tickets %>
                   </span>
                 </div>
 
                 <div class="mt-5 flex items-center justify-between">
-                  <a href="/event/<%= ev._id %>" class="btn-ghost">รายละเอียด</a>
+                  <a
+                    href="/event/<%= ev._id %>"
+                    class="px-4 py-2 rounded-lg border border-red-500/50 hover:bg-red-600 text-white text-sm font-semibold transition"
+                    >รายละเอียด</a
+                  >
 
                   <% if (user && ev.available_tickets > 0) { %>
-                    <form method="post" action="/add-to-cart/<%= ev._id %>">
-                      <input type="hidden" name="quantity" value="1"/>
-                      <button class="btn-primary"><i class="fa-solid fa-cart-plus"></i> ใส่ตะกร้า</button>
+                     <form class="addCartForm" data-event-id="<%= ev._id %>">
+                      <input type="hidden" name="quantity" value="1" />
+                      <button
+                        type="submit"
+                        class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-[0_0_10px_rgba(229,9,20,0.5)] transition"
+                      >
+                        <i class="fa-solid fa-cart-plus mr-1"></i> ใส่ตะกร้า
+                      </button>
                     </form>
                   <% } else if (!user) { %>
-                    <a href="/signup" class="btn-primary">เข้าสู่ระบบเพื่อซื้อ</a>
+                    <a
+                      href="/signup"
+                      class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-[0_0_10px_rgba(229,9,20,0.5)]"
+                      >เข้าสู่ระบบเพื่อซื้อ</a
+                    >
                   <% } else { %>
-                    <span class="text-rose-300">Sold out</span>
+                    <span class="text-red-400">Sold Out</span>
                   <% } %>
                 </div>
 
-                <div class="mt-3 text-xs opacity-70">
-                  ผู้จัด: <%= ev.organizer_id ? ev.organizer_id.email : "-" %>
+                <div class="mt-3 text-xs text-gray-500">
+                  ผู้จัด: <%= ev.organizer_id ? ev.organizer_id.email : '-' %>
                 </div>
               </div>
             </div>
           <% }) %>
         </div>
       <% } else { %>
-        <p class="text-center opacity-80">ไม่พบกิจกรรมที่ค้นหา</p>
+        <p class="text-center text-gray-400 mt-10">ไม่พบกิจกรรมที่ค้นหา</p>
       <% } %>
     </main>
 
     <%- include('partials/footer') %>
   </body>
 </html>
+
+   <script>
+      document.querySelectorAll('.addCartForm').forEach(form => {
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault()
+          const eventId = form.getAttribute('data-event-id')
+          const fd = new FormData(form)
+          const quantity = fd.get('quantity') || 1
+
+          try {
+            const res = await fetch(`/add-to-cart/${eventId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ quantity })
+            })
+            const data = await res.json()
+
+            if (res.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: 'เพิ่มเข้าตะกร้าสำเร็จ!',
+                text: data.msg || 'คุณสามารถดูรายการในหน้าตะกร้าได้เลย',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              })
+            } else {
+              Swal.fire({
+                icon: 'warning',
+                title: 'ไม่สามารถเพิ่มได้',
+                text: data.msg || 'มีบางอย่างผิดพลาด',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              })
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด',
+              text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+              confirmButtonColor: '#e50914',
+              background: '#1a1a1a',
+              color: '#fff',
+              iconColor: '#e50914'
+            })
+          }
+        })
+      })
+    </script>

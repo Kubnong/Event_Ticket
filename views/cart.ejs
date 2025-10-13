@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="th">
   <%- include('partials/head') %>
-  <body class="gachi-bg min-h-screen text-lime-50">
+  <body class="min-h-screen bg-gradient-to-b from-black via-neutral-900 to-zinc-950 text-white font-[Prompt]">
     <%- include('partials/navbar') %>
 
-    <main class="mx-auto max-w-5xl px-4 py-10">
-      <h1 class="font-bangers text-5xl text-lime-300 drop-shadow-neon mb-6">ตะกร้าสินค้า</h1>
+    <main class="mx-auto max-w-5xl px-4 py-14">
+      <h1 class="font-bangers text-5xl text-red-500 drop-shadow-[0_0_12px_rgba(229,9,20,0.8)] mb-8">ตะกร้าสินค้า</h1>
 
       <% if (cartItems && cartItems.length) { %>
         <div id="cartList" class="grid gap-4">
           <% cartItems.forEach(item => { %>
-            <div class="gachi-card flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
+            <div class="bg-neutral-900/80 border border-red-600/40 shadow-[0_0_25px_rgba(229,9,20,0.2)] rounded-2xl p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 transition-transform hover:scale-[1.01]">
               <div class="flex items-center gap-4">
-                <!-- <img src="<%= (item.event_id && item.event_id.cover_image) || "/img/bg-gachi.jpg" %>"
-                     class="h-20 w-32 object-cover rounded-lg border border-lime-400/30" alt="cover"> -->
+                <% if (item.event_id && item.event_id.image_url) { %>
+                  <img src="<%= item.event_id.image_url %>" class="h-20 w-32 object-cover rounded-lg border border-red-500/30" alt="cover">
+                <% } else { %>
+                  <div class="h-20 w-32 rounded-lg bg-neutral-700 flex items-center justify-center text-gray-400 border border-red-500/20">ไม่มีรูป</div>
+                <% } %>
                 <div>
-                  <h3 class="card-title text-xl"><%= item.event_id ? item.event_id.title : "Event" %></h3>
-                  <div class="text-sm opacity-80">จำนวน: <%= item.quantity %></div>
+                  <h3 class="text-lg font-semibold text-white"><%= item.event_id ? item.event_id.title : "Event" %></h3>
+                  <div class="text-sm text-gray-400">จำนวน: <%= item.quantity %></div>
                 </div>
               </div>
 
               <div class="flex items-center gap-4">
-                <div class="text-lime-300 font-bold text-lg">฿<%= item.price %></div>
-                <button data-id="<%= item._id %>" class="btn-danger remove-btn">
+                <div class="text-red-400 font-bold text-lg">฿<%= item.price %></div>
+                <button data-id="<%= item._id %>" class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm font-semibold shadow-[0_0_10px_rgba(229,9,20,0.4)] transition remove-btn">
                   <i class="fa-solid fa-trash-can"></i> ลบ
                 </button>
               </div>
@@ -30,100 +33,149 @@
           <% }) %>
         </div>
 
-        <div id="summary" class="gachi-panel mt-6">
-          <div class="flex items-center justify-between">
+        <div id="summary" class="bg-neutral-900/80 border border-red-600/40 rounded-2xl shadow-[0_0_25px_rgba(229,9,20,0.2)] p-6 mt-8 backdrop-blur-md">
+          <div class="flex items-center justify-between text-sm text-gray-300">
             <span>จำนวนรายการทั้งหมด</span>
-            <span id="totalItems"><%= totalItems %></span>
+            <span id="totalItems" class="font-medium"><%= totalItems %></span>
           </div>
-          <div class="flex items-center justify-between mt-2">
+          <div class="flex items-center justify-between mt-2 text-sm text-gray-300">
             <span>ราคารวม</span>
-            <span id="totalPrice" class="text-lime-300 font-bold">฿<%= totalPrice %></span>
+            <span id="totalPrice" class="text-red-400 font-bold text-lg">฿<%= totalPrice %></span>
           </div>
-          <button id="checkoutBtn" class="btn-primary w-full mt-4"><i class="fa-solid fa-bolt"></i> ชำระเงิน</button>
-          <div id="cartMsg" class="mt-3 text-sm"></div>
+          <button id="checkoutBtn" class="w-full mt-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold shadow-[0_0_15px_rgba(229,9,20,0.6)] transition hover:scale-[1.02]">
+            <i class="fa-solid fa-bolt"></i> ชำระเงิน
+          </button>
         </div>
       <% } else { %>
-        <p class="opacity-80">ตะกร้าว่างเปล่า</p>
+        <p class="text-gray-400 text-center mt-10">ตะกร้าว่างเปล่า</p>
       <% } %>
     </main>
 
+    <!-- ✅ SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-      // ลบจากตะกร้า (DELETE /cart/remove/:id) + อัปเดต DOM
-      document.querySelectorAll('.remove-btn').forEach(btn=>{
-        btn.addEventListener('click', async ()=>{
-          const id = btn.getAttribute('data-id')
-          btn.disabled = true
+      // ลบจากตะกร้า
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-id');
+
+          const confirmResult = await Swal.fire({
+            title: 'ต้องการลบสินค้านี้หรือไม่?',
+            text: 'การลบนี้ไม่สามารถย้อนกลับได้!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'ลบเลย',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#e50914',
+            cancelButtonColor: '#555',
+            background: '#1a1a1a',
+            color: '#fff',
+            iconColor: '#e50914'
+          });
+
+          if (!confirmResult.isConfirmed) return;
+
           try {
-            const r = await fetch('/cart/remove/'+id, { method:'DELETE' })
-            if(!r.ok) throw new Error('delete fail')
-            const data = await r.json()
-            // render ใหม่แบบง่าย ๆ
-            const list = document.getElementById('cartList')
-            list.innerHTML = data.cartItems.map(item=>`
-              <div class="gachi-card flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4">
-                <div class="flex items-center gap-4">
-                  <img src="${(item.event_id && item.event_id.cover_image) || "/img/bg-gachi.jpg"}"
-                       class="h-20 w-32 object-cover rounded-lg border border-lime-400/30" alt="cover">
-                  <div>
-                    <h3 class="card-title text-xl">${item.event_id ? item.event_id.title : "Event"}</h3>
-                    <div class="text-sm opacity-80">จำนวน: ${item.quantity}</div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-4">
-                  <div class="text-lime-300 font-bold text-lg">฿${item.price}</div>
-                  <button data-id="${item._id}" class="btn-danger remove-btn">
-                    <i class="fa-solid fa-trash-can"></i> ลบ
-                  </button>
-                </div>
-              </div>
-            `).join('')
+            const r = await fetch('/cart/remove/' + id, { method: 'DELETE' });
+            const data = await r.json();
 
-            document.getElementById('totalItems').textContent = data.totalItems
-            document.getElementById('totalPrice').textContent = '฿'+data.totalPrice
-
-            // bind ใหม่ให้ปุ่มที่เพิ่ง render
-            document.querySelectorAll('.remove-btn').forEach(b=>{
-              b.addEventListener('click', async ()=> {
-                const id2 = b.getAttribute('data-id')
-                const rr = await fetch('/cart/remove/'+id2, { method:'DELETE' })
-                const dd = await rr.json()
-                // recursion re-render (ย่อ)
-                location.reload()
-              })
-            })
-          } catch (e) {
-            alert('ลบไม่สำเร็จ')
-          } finally {
-            btn.disabled = false
-          }
-        })
-      })
-
-      // Checkout
-      const checkoutBtn = document.getElementById('checkoutBtn')
-      if(checkoutBtn){
-        checkoutBtn.addEventListener('click', async ()=>{
-          checkoutBtn.disabled = true
-          const msg = document.getElementById('cartMsg')
-          msg.textContent = 'กำลังชำระเงิน...'
-          try{
-            const r = await fetch('/cart/checkout', { method:'POST' })
-            const data = await r.json()
-            if(r.ok){
-              msg.className = 'mt-3 text-sm text-lime-300'
-              msg.textContent = data.msg
-              setTimeout(()=>location.href='/my-tickets', 800)
-            }else{
-              msg.className = 'mt-3 text-sm text-rose-300'
-              msg.textContent = data.msg || 'ชำระเงินไม่สำเร็จ'
+            if (r.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: 'ลบสำเร็จ!',
+                text: 'สินค้าถูกลบออกจากตะกร้าแล้ว',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              }).then(() => {
+                // รีโหลดหน้าเพื่ออัปเดต
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'ลบไม่สำเร็จ',
+                text: data.msg || 'เกิดข้อผิดพลาดในการลบสินค้า',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              });
             }
-          }catch(err){
-            msg.className = 'mt-3 text-sm text-rose-300'
-            msg.textContent = 'เกิดข้อผิดพลาด'
-          } finally {
-            checkoutBtn.disabled = false
+          } catch (err) {
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด',
+              text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+              confirmButtonColor: '#e50914',
+              background: '#1a1a1a',
+              color: '#fff',
+              iconColor: '#e50914'
+            });
           }
-        })
+        });
+      });
+
+      // ชำระเงิน
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', async () => {
+          const confirmPay = await Swal.fire({
+            title: 'ยืนยันการชำระเงิน?',
+            text: 'คุณต้องการซื้อตั๋วทั้งหมดในตะกร้านี้หรือไม่?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ชำระเงินเลย',
+            cancelButtonText: 'ยกเลิก',
+            confirmButtonColor: '#e50914',
+            cancelButtonColor: '#555',
+            background: '#1a1a1a',
+            color: '#fff',
+            iconColor: '#e50914'
+          });
+
+          if (!confirmPay.isConfirmed) return;
+
+          try {
+            const r = await fetch('/cart/checkout', { method: 'POST' });
+            const data = await r.json();
+
+            if (r.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: 'ชำระเงินสำเร็จ!',
+                text: data.msg || 'ขอบคุณที่ใช้บริการ 🎫',
+                confirmButtonText: 'ดูตั๋วของฉัน',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              }).then(() => location.href = '/my-tickets');
+            } else {
+              Swal.fire({
+                icon: 'warning',
+                title: 'ชำระเงินไม่สำเร็จ',
+                text: data.msg || 'กรุณาลองใหม่อีกครั้ง',
+                confirmButtonColor: '#e50914',
+                background: '#1a1a1a',
+                color: '#fff',
+                iconColor: '#e50914'
+              });
+            }
+          } catch (err) {
+            Swal.fire({
+              icon: 'error',
+              title: 'เกิดข้อผิดพลาด',
+              text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+              confirmButtonColor: '#e50914',
+              background: '#1a1a1a',
+              color: '#fff',
+              iconColor: '#e50914'
+            });
+          }
+        });
       }
     </script>
 
