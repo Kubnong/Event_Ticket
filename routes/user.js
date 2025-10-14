@@ -6,6 +6,7 @@ const Event = require("../model/event");
 const Ticket = require("../model/ticket");
 const jwt = require("jsonwebtoken");
 const authMiddleware = require("../auth/auth");
+const QRCode = require('qrcode');
 
 // Home Page
 router.get("/", async (req, res) => {
@@ -235,10 +236,28 @@ router.get("/my-tickets", authMiddleware, async (req, res) => {
       populate: { path: "event_id" },
     });
 
-    const myTickets = user.purchased_tickets.map((item) => item.ticket_id);
+    // ดึงเฉพาะ ticket object
+    const myTickets = user.purchased_tickets.map(item => item.ticket_id);
 
-    res.render("my_ticket", { pageTitle: "ตั๋วของฉัน", myTickets });
+    // ✅ เพิ่ม QR Code ให้แต่ละ ticket
+    const ticketsWithQR = await Promise.all(
+      myTickets.map(async (tk) => {
+        const qrText = `https://yourdomain.com/ticket/verify/${tk.ticket_code}`;
+        const qrDataURL = await QRCode.toDataURL(qrText, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#e50914',
+            light: '#00000000'
+          }
+        });
+        return { ...tk.toObject(), qrDataURL };
+      })
+    );
+
+    res.render("my_ticket", { pageTitle: "ตั๋วของฉัน", myTickets: ticketsWithQR });
   } catch (err) {
+    console.error(err);
     res.status(500).send("Server Error!");
   }
 });

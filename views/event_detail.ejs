@@ -8,7 +8,6 @@
 
     <main class="flex-1 mx-auto max-w-5xl px-4 py-14">
       <div class="grid md:grid-cols-2 gap-10">
-        <!-- EVENT INFO -->
         <div
           class="bg-neutral-900/80 border border-red-600/40 rounded-2xl shadow-[0_0_25px_rgba(229,9,20,0.25)] overflow-hidden backdrop-blur-md"
         >
@@ -60,11 +59,14 @@
                   "-" %></span
                 >
               </div>
+              <div>
+                <i class="fa-solid fa-clock text-red-500"></i>
+                <span class="ml-1" id="countdown-timer">กำลังคำนวณ...</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- PURCHASE PANEL -->
         <div
           class="bg-neutral-900/80 border border-red-600/40 rounded-2xl shadow-[0_0_25px_rgba(229,9,20,0.25)] p-8 backdrop-blur-md"
         >
@@ -126,9 +128,10 @@
 </html>
 
 <script>
+  // --- Form Submission Handler ---
   document
     .getElementById("addCartForm")
-    .addEventListener("submit", async (e) => {
+    ?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = e.target;
       const fd = new FormData(form);
@@ -176,4 +179,37 @@
         });
       }
     });
+
+  // --- Countdown Timer Handler ---
+  document.addEventListener("DOMContentLoaded", () => {
+    const countdownElement = document.getElementById("countdown-timer");
+    const eventDateTimeString = `<%= event.date.toISOString().split('T')[0] %>T<%= event.time %>`;
+    const eventTime = new Date(eventDateTimeString).getTime();
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const distance = eventTime - now;
+
+      if (distance < 0) {
+        countdownElement.innerHTML = "งานเริ่มแล้ว!";
+        clearInterval(countdownInterval);
+        return;
+      }
+
+      // คำนวณเวลาที่เหลือ (เพิ่มวินาทีเข้ามา)
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000); // <-- ส่วนที่เพิ่ม
+
+      // อัปเดตการแสดงผล (เพิ่มวินาทีเข้ามา)
+      countdownElement.innerHTML = `เหลืออีก ${days} วัน ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`; // <-- ส่วนที่แก้ไข
+    };
+
+    updateCountdown();
+    // ตั้งค่าให้ฟังก์ชันทำงานซ้ำทุก 1 วินาที
+    const countdownInterval = setInterval(updateCountdown, 1000); // <-- ส่วนที่แก้ไข
+  });
 </script>
