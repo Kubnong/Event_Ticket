@@ -242,7 +242,7 @@ router.get("/my-tickets", authMiddleware, async (req, res) => {
     // ✅ เพิ่ม QR Code ให้แต่ละ ticket
     const ticketsWithQR = await Promise.all(
       myTickets.map(async (tk) => {
-        const qrText = `https://yourdomain.com/ticket/verify/${tk.ticket_code}`;
+        const qrText = `https://webhook.site/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/${tk.ticket_code}`;
         const qrDataURL = await QRCode.toDataURL(qrText, {
           width: 200,
           margin: 2,
